@@ -6,8 +6,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-import seaborn as sns
-import pandas as pd
+import shutil
 
 class Linear(torch.nn.Module):
     def __init__(self,in_dim,out_dim):
@@ -79,17 +78,14 @@ def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
             optimizer.zero_grad()
         train_loss.append(np.mean(temp_loss))
         temp_val_loss = []
-        total_preds = 0
         with torch.no_grad():
             for i in range(len(x_eval)):
                 output = model(x_eval[i].reshape(1,-1).float())
                 loss = loss_function(output, y_eval[i])
                 temp_val_loss.append(loss.item())
             val_loss.append(np.mean(temp_val_loss))
-
         # if epoch %10 == 0 :
         print(f"Epoch: {epoch}, training_loss: {np.mean(temp_loss)},val_loss: {np.mean(temp_val_loss)}")
-
     return train_loss,val_loss
 
 
@@ -105,9 +101,17 @@ def plot_loss(steps,train_loss,val_loss):
     plt.legend()
     plt.show()
 
+def save_checkpoint(model,is_best,checkpoint_path):
+    f_name = "model_param.pt"
+    best_name = "best_model.pt"
+    torch.save(model,checkpoint_path+f_name)
+    if is_best:
+        shutil.copyfile(checkpoint_path+f_name,checkpoint_path+best_name)
+
 
 if __name__ == "__main__":
-    path = "./models/"
+    checkpoint_path = "./models/"
+    min_val_loss = np.inf
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     x_train, y_train, x_test, y_test, x_eval, y_eval, class_names = get_dataset( 'mnist')
     #computing HOG features for all training images
@@ -127,10 +131,23 @@ if __name__ == "__main__":
     model = Linear(x_tr.shape[1],len(class_names)).to(device)
     loss_function = torch.nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters())
-    epoches = 21
+    epoches = 2
     #Training
     print("#"*10+" Training "+"#"*10)
     train_loss, eval_loss = train(model,epoches,x_tr,y_tr,x_ev,y_ev,loss_function,optimizer)
     plot_loss(epoches,train_loss,eval_loss)
     # saving the model
-    torch.save(model.state_dict(),path+"model_params.pt")
+    checkpoint = {
+        "cell_size": [8,8],
+        "block_size": [1,1],
+        "bin_size": 9,
+        "x_test": x_test,
+        "y_test": y_test,
+        "min_val_loss": eval_loss,
+        "sate_dict": model.state_dict()
+        }
+    save_checkpoint(checkpoint,False,checkpoint_path)
+    if eval_loss[-1] <= min_val_loss:
+        print(f"validation loss decreased from {min_val_loss} to {eval_loss[-1]}, saving model .....")
+        save_checkpoint(checkpoint,True,checkpoint_path)
+        min_val_loss = eval_loss[-1]
