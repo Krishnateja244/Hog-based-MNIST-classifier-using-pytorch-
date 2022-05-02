@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-import shutil
+from utils import plot_loss, save_checkpoint
 
 class Linear(torch.nn.Module):
     def __init__(self,in_dim,out_dim):
@@ -90,64 +90,80 @@ def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
 
 
 
-def plot_loss(steps,train_loss,val_loss):
-    steps = np.arange(0,len(train_loss),1)
-    fig = plt.figure()
-    plt.plot(steps,train_loss,label="Traing_loss")
-    plt.plot(steps,val_loss,label="Traing_loss")
-    plt.xlabel("Steps")
-    plt.ylabel("Loss")
-    plt.grid()
-    plt.legend()
-    plt.show()
+# def plot_loss(steps,train_loss,val_loss,counter):
+#     steps = np.arange(0,len(train_loss),1)
+#     fig = plt.figure()
+#     plt.plot(steps,train_loss,label="Traing_loss")
+#     plt.plot(steps,val_loss,label="Validation_loss")
+#     plt.title("Tran_loss vs val_loss")
+#     plt.xlabel("Steps")
+#     plt.ylabel("Loss")
+#     plt.grid()
+#     plt.legend()
+#     plt.savefig(f"./results/validation/train_loss_{str(counter)}.png")
 
-def save_checkpoint(model,is_best,checkpoint_path):
-    f_name = "model_param.pt"
-    best_name = "best_model.pt"
-    torch.save(model,checkpoint_path+f_name)
-    if is_best:
-        shutil.copyfile(checkpoint_path+f_name,checkpoint_path+best_name)
+# def save_checkpoint(model,is_best,checkpoint_path,cntr):
+#     f_name = f"model_param_{str(cntr)}.pt"
+#     best_name = "best_model.pt"
+#     torch.save(model,checkpoint_path+f_name)
+#     if is_best:
+#         shutil.copyfile(checkpoint_path+f_name,checkpoint_path+best_name)
 
+def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval):
+    all_val_loss = []
+    min_val_loss = np.inf
+    cntr = 0 
+    for i in range(len(cell_size_params)):
+        for q in range(len(block_size_params)):
+            for r in range(len(bins_params)):
+                print(f"cell_size = {cell_size_params[i]}\
+                      block_size = {block_size_params[q]}\
+                      bin_size={bins_params[r]}")
+                
+                x_tr_features = compute_hog(cell_size_params[i],block_size_params[q],bins_params[r],x_train)
+                x_ev_features = compute_hog(cell_size_params[i],block_size_params[q],bins_params[r],x_eval)
 
+                x_tr = torch.from_numpy(x_tr_features)
+                y_tr = torch.from_numpy(y_train.reshape(-1,1))
+                y_tr = y_tr.type(torch.LongTensor)
+
+                x_ev = torch.from_numpy(x_ev_features).to(device)
+                y_ev= torch.from_numpy(y_eval.reshape(-1,1))
+                y_ev = y_ev.type(torch.LongTensor).to(device)
+
+                #initializing the model
+                model = Linear(x_tr.shape[1],len(class_names)) 
+                loss_function = torch.nn.CrossEntropyLoss()
+                optimizer = torch.optim.Adam(model.parameters())
+                epoches = 2
+                #Training
+                train_loss, eval_loss = train(model,epoches,x_tr,y_tr,x_ev,y_ev,loss_function,optimizer)
+                all_val_loss.append(eval_loss[-1])
+                # saving the model
+                checkpoint = {
+                    "cell_size": cell_size_params[i],
+                    "block_size": block_size_params[q],
+                    "bin_size": bins_params[r],
+                    "x_test": x_test,
+                    "y_test": y_test,
+                    "min_val_loss": eval_loss,
+                    "sate_dict": model.state_dict(),
+                    "counter" : cntr 
+                    }
+                save_checkpoint(checkpoint,False,checkpoint_path,cntr)
+                if eval_loss[-1] <= min_val_loss:
+                    print(f"validation loss decreased from {min_val_loss} to {eval_loss[-1]}, saving model .....")
+                    save_checkpoint(checkpoint,True,checkpoint_path,cntr)
+                    plot_loss(epoches,train_loss,eval_loss,cntr)
+                    min_val_loss = eval_loss[-1]
+                cntr +=1
+    
 if __name__ == "__main__":
     checkpoint_path = "./models/"
-    min_val_loss = np.inf
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    cell_size_params = [(8,8),(4,4)] #,(7,7)]
+    block_size_params = [(1,1),(1,2)] #,(2,2)]
+    bins_params = [9,8,6]
+
     x_train, y_train, x_test, y_test, x_eval, y_eval, class_names = get_dataset( 'mnist')
-    #computing HOG features for all training images
-    x_tr_features = compute_hog([8,8],[1,1],9,x_train)
-    #computing HOG features for all test images
-    x_ev_features = compute_hog([8,8],[1,1],9,x_eval)
-
-    x_tr = torch.from_numpy(x_tr_features).to(device)
-    y_tr = torch.from_numpy(y_train.reshape(-1,1))
-    y_tr = y_tr.type(torch.LongTensor).to(device)
-
-    x_ev = torch.from_numpy(x_ev_features).to(device)
-    y_ev= torch.from_numpy(y_eval.reshape(-1,1))
-    y_ev = y_ev.type(torch.LongTensor).to(device)
-
-    #initializing the model
-    model = Linear(x_tr.shape[1],len(class_names)).to(device)
-    loss_function = torch.nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.parameters())
-    epoches = 2
-    #Training
-    print("#"*10+" Training "+"#"*10)
-    train_loss, eval_loss = train(model,epoches,x_tr,y_tr,x_ev,y_ev,loss_function,optimizer)
-    plot_loss(epoches,train_loss,eval_loss)
-    # saving the model
-    checkpoint = {
-        "cell_size": [8,8],
-        "block_size": [1,1],
-        "bin_size": 9,
-        "x_test": x_test,
-        "y_test": y_test,
-        "min_val_loss": eval_loss,
-        "sate_dict": model.state_dict()
-        }
-    save_checkpoint(checkpoint,False,checkpoint_path)
-    if eval_loss[-1] <= min_val_loss:
-        print(f"validation loss decreased from {min_val_loss} to {eval_loss[-1]}, saving model .....")
-        save_checkpoint(checkpoint,True,checkpoint_path)
-        min_val_loss = eval_loss[-1]
+    classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval)
