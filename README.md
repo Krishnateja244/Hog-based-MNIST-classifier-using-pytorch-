@@ -19,8 +19,8 @@ The goal of this seed is to structure ML paper-code the same so that work can ea
 # Hog-based-Linear-Classifier-using-Pytorch     
 
 -->
-![CI testing](https://github.com/PyTorchLightning/deep-learning-project-template/workflows/CI%20testing/badge.svg?branch=master&event=push)
-
+<!-- ![CI testing](https://github.com/PyTorchLightning/deep-learning-project-template/workflows/CI%20testing/badge.svg?branch=master&event=push)
+ -->
 
 <!--  
 Conference   
