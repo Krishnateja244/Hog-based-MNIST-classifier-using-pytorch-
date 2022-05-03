@@ -6,10 +6,19 @@ import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
-from utils import plot_loss, save_checkpoint
+from utils import plot_loss, save_checkpoint, display_train_samples
 
 class Linear(torch.nn.Module):
+    """
+    Class applies linear transformation to the incoming data
+    """
     def __init__(self,in_dim,out_dim):
+        """
+        Class initializer
+        Args:
+            in_dim (int): dimension of input features
+            out_dim (int): dimension of the output 
+        """
         super().__init__()
         self.in_features = in_dim
         self.out_dim = out_dim
@@ -17,30 +26,31 @@ class Linear(torch.nn.Module):
         self.bias = torch.nn.Parameter(torch.randn(out_dim))
     
     def forward(self,inputs):
+        """
+        Applies the linear transformation
+
+        Args:
+            inputs (torch): data to be trained
+
+        Returns:
+            torch : output of the transformation
+        """
         output = inputs @ self.weights.t() +self.bias
         return output
 
 
-def compute_hog(cell_size: int, block_size: int, nbins: int, imgs_gray: np.ndarray) -> np.ndarray:
+def compute_hog(cell_size, block_size, nbins, imgs_gray):
     """
-    Wrapper for the OpenCV interface for HOG features.
-    
-    Parameters
-    ----------
-    cell_size: int
-        number of pixels in a square cell in x and y direction (e.g. (4,4), (8,8))
-    block_size int
-        number of cells in a block in x and y direction (e.g., (1,1), (1,2))
-    nbins: int
-        number of bins in a orientation histogram in x and y direction (e.g. 6, 9, 12)
-    imgs_gray np.ndarray
-        images with which to perform HOG feature extraction (dimensions (nr, width, height))
-    
-    Returns
-    ----------
-    np.ndarray
-        array of shape H x imgs_gray.shape[0] where H is the size of the resulting HOG feature vector
-        (depends on parameters)
+    Function computes HOG features for images data using parameters
+
+    Args:
+        cell_size (tuple):  number of pixels in a square cell in x and y direction (e.g. (4,4), (8,8))
+        block_size (tuple) : number of cells in a block in x and y direction (e.g., (1,1), (1,2))
+        nbins (tuple) : number of bins in a orientation histogram in x and y direction (e.g. 6, 9, 12)
+        imgs_gray (np.ndarray) : images with which to perform HOG feature extraction (dimensions (nr, width, height))
+
+    Returns:
+        hog_feats (np.ndarray) : array of shape H x imgs_gray.shape[0] where H is the size of the resulting HOG feature vector
     """
     hog = cv2.HOGDescriptor(_winSize=(imgs_gray.shape[2] // cell_size[1] * cell_size[1],
                                       imgs_gray.shape[1] // cell_size[0] * cell_size[0]),
@@ -61,15 +71,30 @@ def compute_hog(cell_size: int, block_size: int, nbins: int, imgs_gray: np.ndarr
 
     return hog_feats
 
-
-
 def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
-    
+    """
+    Function performs training using the HOG FEATURES as inputs
+
+    Args:
+        model : model for training
+        epoches (int): Number of epoches
+        x_data (tensor): Training HOG features
+        y_data (tensor): Output training data
+        x_eval (tensor): Validation HOG features
+        y_eval (tensor): output validation data
+        loss_function : Loss function to calculate loss
+        optimizer : Performs gradient descent to optimize parameters
+
+    Returns:
+        train_loss (list): Training loss for each epoch
+        val_loss (list): Validation loss for each epoch
+    """
     train_loss = []
     val_loss = []
     for epoch in range(epoches):
         temp_loss = []
         for i in range(len(x_data)):
+            model.train()
             output = model(x_data[i].reshape(1,-1).float())
             loss = loss_function(output, y_data[i])
             loss.backward()
@@ -78,6 +103,7 @@ def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
             optimizer.zero_grad()
         train_loss.append(np.mean(temp_loss))
         temp_val_loss = []
+        model.eval()
         with torch.no_grad():
             for i in range(len(x_eval)):
                 output = model(x_eval[i].reshape(1,-1).float())
@@ -89,27 +115,19 @@ def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
     return train_loss,val_loss
 
 
-
-# def plot_loss(steps,train_loss,val_loss,counter):
-#     steps = np.arange(0,len(train_loss),1)
-#     fig = plt.figure()
-#     plt.plot(steps,train_loss,label="Traing_loss")
-#     plt.plot(steps,val_loss,label="Validation_loss")
-#     plt.title("Tran_loss vs val_loss")
-#     plt.xlabel("Steps")
-#     plt.ylabel("Loss")
-#     plt.grid()
-#     plt.legend()
-#     plt.savefig(f"./results/validation/train_loss_{str(counter)}.png")
-
-# def save_checkpoint(model,is_best,checkpoint_path,cntr):
-#     f_name = f"model_param_{str(cntr)}.pt"
-#     best_name = "best_model.pt"
-#     torch.save(model,checkpoint_path+f_name)
-#     if is_best:
-#         shutil.copyfile(checkpoint_path+f_name,checkpoint_path+best_name)
-
 def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval):
+    """
+    Function performs training for different hyperparametrs and saves model with less validation loss
+
+    Args:
+        cell_size_params (list): cell size for computing HOG features
+        block_size_params (list): block size for computing HOG features
+        bins_params (list): num of bins for computing HOG features
+        x_train (tensor): Input traing data
+        x_eval (tensor): Input validation data
+        y_train (tensor): Output training data
+        y_eval (tensor): output validation data
+    """
     all_val_loss = []
     min_val_loss = np.inf
     cntr = 0 
@@ -135,7 +153,7 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
                 model = Linear(x_tr.shape[1],len(class_names)) 
                 loss_function = torch.nn.CrossEntropyLoss()
                 optimizer = torch.optim.Adam(model.parameters())
-                epoches = 2
+                epoches = 11
                 #Training
                 train_loss, eval_loss = train(model,epoches,x_tr,y_tr,x_ev,y_ev,loss_function,optimizer)
                 all_val_loss.append(eval_loss[-1])
@@ -163,7 +181,7 @@ if __name__ == "__main__":
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     cell_size_params = [(8,8),(4,4)] #,(7,7)]
     block_size_params = [(1,1),(1,2)] #,(2,2)]
-    bins_params = [9,8,6]
-
+    bins_params = [9] #,8,6]
     x_train, y_train, x_test, y_test, x_eval, y_eval, class_names = get_dataset( 'mnist')
+    display_train_samples(x_train)
     classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval)

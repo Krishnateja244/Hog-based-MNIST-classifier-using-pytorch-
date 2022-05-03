@@ -7,6 +7,19 @@ from sklearn.metrics import confusion_matrix, f1_score,precision_score,recall_sc
 from utils import plot_confusion_matrix, display_predictions,load_checkpoint
 
 def testing(model,x_data,y_data,loss_function):
+    """
+    Function to test the trained model
+
+    Args:
+        model : trained model
+        x_data (tensor): testing HOG features
+        y_data (tensor): testing output data
+        loss_function : loss function to calculate loss
+
+    Returns:
+        Accuracy: accuracy on the data
+        testing_loss: test loss
+    """
     total_preds, true_preds = 0,0
     temp_loss = []
     preds = []
@@ -36,8 +49,6 @@ def testing(model,x_data,y_data,loss_function):
 if __name__ == "__main__":
     checkpoint_path = "./models/best_model.pt"
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-    # x_train, y_train, x_test, y_test, x_eval, y_eval, class_names = get_dataset( 'mnist')
-    
     cell_size,block_size,bin_size,x_test,y_test,check_point,cntr = load_checkpoint(checkpoint_path)
     print(cell_size,block_size,bin_size,cntr)
     x_te_features = compute_hog(cell_size,block_size,bin_size,x_test)
@@ -46,7 +57,6 @@ if __name__ == "__main__":
     y_te = y_te.type(torch.LongTensor).to(device)
     model = Linear(x_te.shape[1],10).to(device)
     model.load_state_dict(check_point['sate_dict'])
-    # model.load_state_dict(torch.load("model_params.pt"))
     model.eval()
     loss_function = torch.nn.CrossEntropyLoss()
     print("#"*10+"Testing"+"#"*10)
