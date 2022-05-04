@@ -1,5 +1,3 @@
-from scipy import rand
-from zmq import device
 from dataset import get_dataset
 import torch
 import matplotlib.pyplot as plt
