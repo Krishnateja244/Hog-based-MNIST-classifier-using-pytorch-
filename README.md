@@ -65,7 +65,7 @@ python train.py
 
 ## Model
 
-This project uses a simple Linear classifier using ```torch.nn.Module```. 
+This project uses a simple Linear classifier using ```torch.nn.Module```. Model uses ``` torch.nn.CrossEntropyLoss()``` for calculating the loss. Inorder to evaluate the model, the validation loss is calculated along with training loss to observe any case of ```Overfitting``` or ```Underfitting```.
 
 ### Hyperparameters
 Epoches: 21
