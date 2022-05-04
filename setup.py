@@ -3,14 +3,14 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='project',
+    name='Hog-based-MNIST-classifier-using-pytorch',
     version='0.0.0',
-    description='Describe Your Cool Project',
-    author='',
-    author_email='',
-    # REPLACE WITH YOUR OWN GITHUB PROJECT LINK
-    url='https://github.com/PyTorchLightning/pytorch-lightning-conference-seed',
-    install_requires=['pytorch-lightning'],
+    description='This Project classifies MNIST dataset consisting \
+    of handwritten digits between 0-9 using Histogram of Oriented Gradients(HOG) features. Pytorch is used for building this classifier. ',
+    author='Krishna Teja Nallanukala',
+    author_email='krishnatejanallanukala@gmail.com',
+    url='https://github.com/Krishnateja244/Hog-based-MNIST-classifier-using-pytorch-.git',
+    install_requires=['torch'],
     packages=find_packages(),
 )
 
