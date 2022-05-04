@@ -73,14 +73,25 @@ Optimizer: Adam
 Learning rate: 0.001
 Batchsize : 8 
 
+```python
+class Linear(torch.nn.Module):
+    def __init__(self,in_dim,out_dim):
+        super().__init__()
+        self.in_features = in_dim
+        self.out_dim = out_dim
+        self.weights = torch.nn.Parameter(torch.randn(out_dim,in_dim))
+        self.bias = torch.nn.Parameter(torch.randn(out_dim))
+    
+    def forward(self,inputs):
+        output = inputs @ self.weights.t() +self.bias
+        return output
+```
 ## Experiements
 
 
 
 
-```python
 
-```
 
 <!-- ### Citation   
 ```
