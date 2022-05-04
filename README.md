@@ -75,6 +75,11 @@ cell_size_params = [(8,8),(4,4),(7,7)]
 block_size_params = [(1,1),(1,2),(2,2)]
 bins_params = [9,8,6]
 ```
+The experiemnts resulted in a model with less validation error and does not overfit the data. Below is the training loss, validation loss plot of the model.
+The parameters resulted for better performance are ```(8,8)```,```(1,1)```,```6```
+
+![trainvsval](results/validation/train_loss_2.png)
+
 ## Results
 
 The experiments resulted in a model a with less validation loss and model is a perferct fit to the data.
