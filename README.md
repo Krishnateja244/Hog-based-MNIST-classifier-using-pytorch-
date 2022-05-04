@@ -1,6 +1,6 @@
 <div align="left">    
  
-# Hog based-MNIST classifier using pytorch 
+# Hog based MNIST classifier using pytorch 
 
 ## Description  
 
