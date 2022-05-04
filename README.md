@@ -67,7 +67,7 @@ python train.py
 
 This project uses a simple Linear classifier using ```torch.nn.Module```. 
 
-# Hyperparameters
+### Hyperparameters
 Epoches: 21
 Optimizer: Adam
 Learning rate: 0.001
