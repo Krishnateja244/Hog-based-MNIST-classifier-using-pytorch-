@@ -16,7 +16,7 @@ The goal of this seed is to structure ML paper-code the same so that work can ea
 
 <div align="left">    
  
-# Hog-based-MNIST-classifier-using-pytorch 
+# Hog based-MNIST classifier using pytorch 
 
 -->
 <!-- ![CI testing](https://github.com/PyTorchLightning/deep-learning-project-template/workflows/CI%20testing/badge.svg?branch=master&event=push)
@@ -29,22 +29,18 @@ Conference
  
 ## Description  
 
-------------
-
 This Project classifies MNIST dataset consisting of handwritten digits between 0-9 using Histogram of Oriented Gradients(HOG) features. Pytorch is used for building this classifier. MNIST contains 70,000 images of handwritten digits: 60,000 for training and 10,000 for testing. The images are grayscale, 28x28 pixels. 
 
 Nowadays, Convolutional Neural Networks(CNN) are the state of the art for classifying the MNIST dataset. But this project focuses mainly on how HOG parameters influence the feature extraction process and influence the classification. 
 
 ## Dataset preparation
 
-------------
-
-The datasets are downloaded from the ``` torchvision.datasets.MNIST ``` and pytorch dataloader to load batches of trainingdata. 
+The datasets are downloaded from the ``` torchvision.datasets.MNIST ``` and pytorch dataloader ``` torch.utils.data.DataLoader``` to load batches of training data. 
 
 Few images of dataset are visualized here in below figure.
 
 ![My Image](results/test/prediction.png)
-
+*Training Images*
 ## How to run   
 First, install dependencies   
 ```bash
