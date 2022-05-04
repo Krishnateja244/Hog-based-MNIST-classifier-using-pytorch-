@@ -88,9 +88,30 @@ class Linear(torch.nn.Module):
 ```
 ## Experiements
 
+In this project models are generated using different parameters that influence the feature extraction of HOG and the model with less validation loss is selected as checkpoint. This model checkpoint is used on testing dataset to measure the accuracy of classification.
 
+The parameters used for extracting HOG features are:
+1. cell_size :  number of pixels in a square cell in x and y direction (e.g. (4,4), (8,8))
+2. block_size : number of cells in a block in x and y direction (e.g., (1,1), (1,2))
+3. nbins : number of bins in a orientation histogram in x and y direction (e.g. 6, 9, 12)
 
+```python
+cell_size_params = [(8,8),(4,4),(7,7)]
+block_size_params = [(1,1),(1,2),(2,2)]
+bins_params = [9,8,6]
+```
+## Results
 
+The experiments resulted in a model a with less validation loss and model is a perferct fit to the data.
+The metrics used to evaluate the model are ```Accuracy```,```Precision```,```Recall``` and ```F1score```. 
+
+The results from the model are:
+![metrics](results/test/metrics.png)
+
+![confusion_matrix](results/test/confusion_matrix.png)
+
+Below are the predictions made by the model on the test dataset
+![predictions](results/test/prediction.png)
 
 
 <!-- ### Citation   
