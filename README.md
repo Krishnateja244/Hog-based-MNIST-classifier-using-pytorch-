@@ -40,7 +40,7 @@ The datasets are downloaded from the ``` torchvision.datasets.MNIST ``` and pyto
 Few images of dataset are visualized here in below figure.
 
 ![My Image](results/test/prediction.png)
-*Training Images*
+
 ## How to run   
 First, install dependencies   
 ```bash
