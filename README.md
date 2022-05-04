@@ -4,7 +4,7 @@
  
 ## Table of contents
 * [Description](#description)
-* [Datasetpreparation](#dataset preparation)
+* [Dataset preparation](#datasetpreparation)
 * [HowtoRun](#how to run)
 
 ## Description  
