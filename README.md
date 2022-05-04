@@ -5,8 +5,11 @@
 ## Table of contents
 * [Description](#description)
 * [Dataset preparation](#datasetpreparation)
-* [HowtoRun](#how to run)
-
+* [How to Run](#howtorun)
+* [Model](#model)
+* [Experiments](#experiments)
+* [Results](#results)
+ 
 ## Description  
 
 This Project classifies MNIST dataset consisting of handwritten digits between 0-9 using Histogram of Oriented Gradients(HOG) features. Pytorch is used for building this classifier. MNIST contains 70,000 images of handwritten digits: 60,000 for training and 10,000 for testing. The images are grayscale, 28x28 pixels. 
