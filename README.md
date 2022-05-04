@@ -41,6 +41,8 @@ Few images of dataset are visualized here in below figure.
 
 ![My Image](results/train/samples.png)
 
+The Dataset consists of ```70000``` images in which ```40000``` are used for training ```20000``` for validation and ```10000``` for testing.
+
 ## How to run   
 First, install dependencies   
 ```bash
@@ -61,7 +63,20 @@ cd project
 python train.py
 ```
 
-## Imports
+## Model
+
+This project uses a simple Linear classifier using ```torch.nn.Module```. 
+
+# Hyperparameters
+Epoches: 21
+Optimizer: Adam
+Learning rate: 0.001
+Batchsize : 8 
+
+## Experiements
+
+
+
 
 ```python
 
