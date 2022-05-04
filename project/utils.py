@@ -55,7 +55,7 @@ def plot_loss(steps,train_loss,val_loss,counter):
     plt.legend()
     plt.savefig(f"./results/validation/train_loss_{str(counter)}.png")
 
-def save_checkpoint(model,is_best,checkpoint_path,cntr):
+def save_checkpoint(model,checkpoint_path):
     """
     Function to save checkpoints of model
 
@@ -65,11 +65,10 @@ def save_checkpoint(model,is_best,checkpoint_path,cntr):
         checkpoint_path (str): destination to save checkpoint
         cntr (int): integer counter to keep track of set of hyperparameters used
     """
-    f_name = f"model_param_{str(cntr)}.pt"
     best_name = "best_model.pt"
-    torch.save(model,checkpoint_path+f_name)
-    if is_best:
-        shutil.copyfile(checkpoint_path+f_name,checkpoint_path+best_name)
+    # if is_best:
+    torch.save(model,checkpoint_path+best_name)
+        
 
 def display_predictions(model,x_data,x_test):
     """
@@ -125,3 +124,4 @@ def load_checkpoint(checkpoint_path):
     y_test = check_point["y_test"]
     cntr = check_point["counter"]
     return cell_size,block_size,bin_size,x_test,y_test,check_point,cntr
+

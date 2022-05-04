@@ -125,8 +125,13 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
         x_eval (tensor): Input validation data
         y_train (tensor): Output training data
         y_eval (tensor): output validation data
+
+    Returns:
+        all_val_loss(list): validation loss for all possible parameter combinations
+        all_train_loss(list): Train loss for all possible parameter combinations
     """
     all_val_loss = []
+    all_train_loss = []
     min_val_loss = np.inf
     cntr = 0 
     for i in range(len(cell_size_params)):
@@ -155,6 +160,7 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
                 #Training
                 train_loss, eval_loss = train(model,epoches,x_tr,y_tr,x_ev,y_ev,loss_function,optimizer)
                 all_val_loss.append(eval_loss[-1])
+                all_train_loss.append(train_loss[-1])
                 # saving the model
                 checkpoint = {
                     "cell_size": cell_size_params[i],
@@ -166,20 +172,21 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
                     "sate_dict": model.state_dict(),
                     "counter" : cntr 
                     }
-                save_checkpoint(checkpoint,False,checkpoint_path,cntr)
+                # save_checkpoint(checkpoint,False,checkpoint_path,cntr)
                 if eval_loss[-1] <= min_val_loss:
                     print(f"validation loss decreased from {min_val_loss} to {eval_loss[-1]}, saving model .....")
-                    save_checkpoint(checkpoint,True,checkpoint_path,cntr)
+                    save_checkpoint(checkpoint,checkpoint_path)
                     plot_loss(epoches,train_loss,eval_loss,cntr)
                     min_val_loss = eval_loss[-1]
                 cntr +=1
+    return all_train_loss,all_val_loss
     
 if __name__ == "__main__":
     checkpoint_path = "./models/"
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     cell_size_params = [(8,8),(4,4)] #,(7,7)]
     block_size_params = [(1,1),(1,2)] #,(2,2)]
-    bins_params = [9] #,8,6]
+    bins_params = [9,8] #,6]
     x_train, y_train, x_test, y_test, x_eval, y_eval, class_names = get_dataset( 'mnist')
     display_train_samples(x_train)
-    classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval)
+    all_train_loss,all_val_loss = classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x_eval,y_train,y_eval)
