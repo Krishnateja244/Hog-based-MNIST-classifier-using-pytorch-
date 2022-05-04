@@ -39,17 +39,16 @@ The datasets are downloaded from the ``` torchvision.datasets.MNIST ``` and pyto
 
 Few images of dataset are visualized here in below figure.
 
-![My Image](results/test/prediction.png)
+![My Image](results/train/samples.png)
 
 ## How to run   
 First, install dependencies   
 ```bash
 # clone project   
-git clone https://github.com/YourGithubName/deep-learning-project-template
+git clone https://github.com/Krishnateja244/Hog-based-MNIST-classifier-using-pytorch-.git
 
 # install project   
-cd deep-learning-project-template 
-pip install -e .   
+cd Hog-based-MNIST-classifier-using-pytorch  
 pip install -r requirements.txt
  ```   
  Next, navigate to any file and run it.   
@@ -59,7 +58,7 @@ pip install -r requirements.txt
 cd project
 
 # run module 
-python lit_classifier_main.py    
+python train.py
 ```
 
 ## Imports
