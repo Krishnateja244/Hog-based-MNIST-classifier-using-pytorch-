@@ -14,9 +14,9 @@ The goal of this seed is to structure ML paper-code the same so that work can ea
  
 ---
 
-<div align="center">    
+<div align="left">    
  
-# Hog-based-Linear-Classifier-using-Pytorch     
+# Hog-based-MNIST-classifier-using-pytorch 
 
 -->
 <!-- ![CI testing](https://github.com/PyTorchLightning/deep-learning-project-template/workflows/CI%20testing/badge.svg?branch=master&event=push)
@@ -27,8 +27,23 @@ Conference
 -->   
 </div>
  
-## Description   
-What it does   
+## Description  
+
+------------
+
+This Project classifies MNIST dataset consisting of handwritten digits between 0-9 using Histogram of Oriented Gradients(HOG) features. Pytorch is used for building this classifier. MNIST contains 70,000 images of handwritten digits: 60,000 for training and 10,000 for testing. The images are grayscale, 28x28 pixels. 
+
+Nowadays, Convolutional Neural Networks(CNN) are the state of the art for classifying the MNIST dataset. But this project focuses mainly on how HOG parameters influence the feature extraction process and influence the classification. 
+
+## Dataset preparation
+
+------------
+
+The datasets are downloaded from the ``` torchvision.datasets.MNIST ``` and pytorch dataloader to load batches of trainingdata. 
+
+Few images of dataset are visualized here in below figure.
+
+![My Image](results/test/prediction.png)
 
 ## How to run   
 First, install dependencies   
@@ -43,35 +58,21 @@ pip install -r requirements.txt
  ```   
  Next, navigate to any file and run it.   
  ```bash
+
 # module folder
 cd project
 
-# run module (example: mnist as your main contribution)   
+# run module 
 python lit_classifier_main.py    
 ```
 
 ## Imports
-This project is setup as a package which means you can now easily import any file into any other file like so:
+
 ```python
-from project.datasets.mnist import mnist
-from project.lit_classifier_main import LitClassifier
-from pytorch_lightning import Trainer
 
-# model
-model = LitClassifier()
-
-# data
-train, val, test = mnist()
-
-# train
-trainer = Trainer()
-trainer.fit(model, train, val)
-
-# test using the best model!
-trainer.test(test_dataloaders=test)
 ```
 
-### Citation   
+<!-- ### Citation   
 ```
 @article{YourName,
   title={Your Title},
@@ -79,4 +80,4 @@ trainer.test(test_dataloaders=test)
   journal={Location},
   year={Year}
 }
-```   
+```    -->
