@@ -81,6 +81,7 @@ The experiments resulted in a model a with less validation loss and model is a p
 The metrics used to evaluate the model are ```Accuracy```,```Precision```,```Recall``` and ```F1score```. 
 
 The results from the model are:
+
 ![metrics](results/test/metrics.png)
 
 ![confusion_matrix](results/test/confusion_matrix.png)
