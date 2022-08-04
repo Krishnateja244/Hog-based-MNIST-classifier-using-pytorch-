@@ -101,3 +101,8 @@ The results from the model are:
 
 Below are the predictions made by the model on the test dataset
 ![predictions](results/test/prediction.png)
+
+By observing the above results it is clear that HOG features are good in classifying the MINIST dataset. But in order to see how HOG feature extraction seperates the 
+classes in another way, we perform K-means clustering on the extracted features using the best HOG parameters obtained from above experiment. In the below figure images corresponding to some of the HOG vectors that have minimum Euclidean distance to the cluster centers are shown.
+
+![clustering](results/test/clustering.png)
