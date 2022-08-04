@@ -6,6 +6,8 @@ import numpy as np
 from sklearn.metrics import confusion_matrix, plot_confusion_matrix
 from utils import plot_loss, save_checkpoint, display_train_samples
 
+device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+
 class Linear(torch.nn.Module):
     """
     Class applies linear transformation to the incoming data
@@ -20,8 +22,8 @@ class Linear(torch.nn.Module):
         super().__init__()
         self.in_features = in_dim
         self.out_dim = out_dim
-        self.weights = torch.nn.Parameter(torch.randn(out_dim,in_dim))
-        self.bias = torch.nn.Parameter(torch.randn(out_dim))
+        self.weights = torch.nn.Parameter(torch.randn(out_dim,in_dim).to(device))
+        self.bias = torch.nn.Parameter(torch.randn(out_dim).to(device))
     
     def forward(self,inputs):
         """
@@ -93,12 +95,12 @@ def train(model,epoches,x_data,y_data,x_eval,y_eval,loss_function,optimizer):
         temp_loss = []
         for i in range(len(x_data)):
             model.train()
+            optimizer.zero_grad()
             output = model(x_data[i].reshape(1,-1).float())
             loss = loss_function(output, y_data[i])
             loss.backward()
             temp_loss.append(loss.item())
             optimizer.step()
-            optimizer.zero_grad()
         train_loss.append(np.mean(temp_loss))
         temp_val_loss = []
         model.eval()
@@ -144,9 +146,9 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
                 x_tr_features = compute_hog(cell_size_params[i],block_size_params[q],bins_params[r],x_train)
                 x_ev_features = compute_hog(cell_size_params[i],block_size_params[q],bins_params[r],x_eval)
 
-                x_tr = torch.from_numpy(x_tr_features)
+                x_tr = torch.from_numpy(x_tr_features).to(device)
                 y_tr = torch.from_numpy(y_train.reshape(-1,1))
-                y_tr = y_tr.type(torch.LongTensor)
+                y_tr = y_tr.type(torch.LongTensor).to(device)
 
                 x_ev = torch.from_numpy(x_ev_features).to(device)
                 y_ev= torch.from_numpy(y_eval.reshape(-1,1))
@@ -168,6 +170,8 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
                     "bin_size": bins_params[r],
                     "x_test": x_test,
                     "y_test": y_test,
+                    "x_train":x_train,
+                    "y_train":y_train,
                     "min_val_loss": eval_loss,
                     "sate_dict": model.state_dict(),
                     "counter" : cntr 
@@ -183,7 +187,7 @@ def classifier_analyzer(cell_size_params,block_size_params,bins_params,x_train,x
     
 if __name__ == "__main__":
     checkpoint_path = "./models/"
-    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    
     cell_size_params = [(8,8),(4,4)] #,(7,7)]
     block_size_params = [(1,1),(1,2)] #,(2,2)]
     bins_params = [9,8] #,6]

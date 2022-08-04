@@ -122,6 +122,8 @@ def load_checkpoint(checkpoint_path):
     bin_size = check_point["bin_size"]
     x_test = check_point["x_test"]
     y_test = check_point["y_test"]
+    x_train = check_point["x_train"]
+    y_train = check_point["y_train"]
     cntr = check_point["counter"]
-    return cell_size,block_size,bin_size,x_test,y_test,check_point,cntr
+    return cell_size,block_size,bin_size,x_test,y_test,x_train,y_train,check_point,cntr
 
